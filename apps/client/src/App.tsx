@@ -1,35 +1,12 @@
-import { useState } from "react";
-import { trpc } from "./client";
 import "./App.css";
-import { Button } from "./components/ui/button";
+import Chat from "./components/Chat";
 
 function App() {
-  const [greeting, setGreeting] = useState<string[] | null>(null);
-
-  const handleFetchGreeting = async () => {
-    try {
-      const result = await trpc.greeting.query({ name: "World" });
-      setGreeting((prev) => [...(prev || []), result]);
-    } catch (error) {
-      console.error("Error fetching tRPC greeting:", error);
-      setGreeting((prev) => [...(prev || []), "Error fetching greeting"]);
-    }
-  };
-
   return (
-    <div>
-      <h1>tRPC Example</h1>
-      {greeting ? (
-        <ul>
-          {greeting.map((greeting, index) => (
-            <li key={index}>{greeting}</li>
-          ))}
-        </ul>
-      ) : (
-        <p>Loading...</p>
-      )}
-      <Button onClick={handleFetchGreeting}>Fetch Greeting</Button>
-      {greeting && <p>tRPC Greeting: {greeting}</p>}
+    <div className="app-container">
+      <div className="chat-wrapper">
+        <Chat />
+      </div>
     </div>
   );
 }
