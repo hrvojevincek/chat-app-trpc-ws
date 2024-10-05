@@ -1,9 +1,9 @@
 import { PlusIcon } from "@/assets/icons";
 import { Button } from "@/components/ui/button";
+import { useUsers } from "@/hooks/useUsers";
+import { useEffect, useState } from "react";
 import MainRoom from "./MainRoom";
 import { NicknameModal } from "./NicknameModal";
-import { createUser } from "@/api/userApi";
-import { useEffect, useState } from "react";
 import { UsersList } from "./UsersList";
 
 export default function Chat() {
@@ -12,22 +12,33 @@ export default function Chat() {
     null
   );
 
+  const { addUser } = useUsers();
+
   useEffect(() => {
-    if (!userId) {
+    const storedUser = localStorage.getItem("user");
+
+    if (storedUser) {
+      setUserId(JSON.parse(storedUser));
+    } else {
       setIsNicknameModalOpen(true);
     }
   }, []);
 
   const handleNicknameSubmit = async (nickname: string) => {
     try {
-      const user = await createUser(nickname);
+      const user = await addUser(nickname);
       setUserId({ id: user.id, name: user.name });
+      localStorage.setItem(
+        "user",
+        JSON.stringify({ id: user.id, name: user.name })
+      );
       setIsNicknameModalOpen(false);
     } catch (error) {
       console.error("Error creating user:", error);
       // Handle error (e.g., show an error message to the user)
     }
   };
+
   return (
     <>
       <NicknameModal

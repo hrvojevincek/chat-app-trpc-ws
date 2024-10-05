@@ -1,21 +1,8 @@
-import { useState, useEffect } from "react";
-import { getUsers, subscribeToNewUsers } from "@/api/userApi";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useUsers } from "@/hooks/useUsers";
 
 export function UsersList() {
-  const [users, setUsers] = useState<{ id: string; name: string }[]>([]);
-
-  useEffect(() => {
-    getUsers().then(setUsers);
-
-    const subscription = subscribeToNewUsers((newUser) => {
-      setUsers((prevUsers) => [...prevUsers, newUser]);
-    });
-
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, []);
+  const { users } = useUsers();
 
   return (
     <div className="space-y-4">
