@@ -2,24 +2,63 @@ import { observable } from "@trpc/server/observable";
 import { t } from "../trpc";
 import { z } from "zod";
 import EventEmitter from "events";
+import { addUser, getUser, getUsers } from "../db/users";
+import { addMessage } from "../db/messages";
 
 const eventEmitter = new EventEmitter();
 
 export const appRouter = t.router({
-  greeting: t.procedure
+  addUser: t.procedure
     .input(z.object({ name: z.string() }))
-    .query((requestObj) => {
-      console.log(requestObj);
-      eventEmitter.emit("update", requestObj.input.name);
-      return `Hello ${requestObj.input.name}`;
+    .mutation(({ input }) => {
+      const newUser = addUser(input);
+      eventEmitter.emit("newUser", newUser);
+      return { id: newUser.id, name: newUser.name };
     }),
-  errors: t.procedure.query(() => {
-    throw new Error("This is an error message");
+  onNewUser: t.procedure.subscription(() => {
+    return observable<{ id: string; name: string }>((emit) => {
+      const onNewUser = (user: { id: string; name: string }) => {
+        emit.next(user);
+      };
+      eventEmitter.on("newUser", onNewUser);
+      return () => {
+        eventEmitter.off("newUser", onNewUser);
+      };
+    });
   }),
-  hello: t.procedure.query(() => {
-    eventEmitter.emit("update", "Hello World AGAIN");
-    return "Hello World AGAIN";
+
+  // Get all users
+  getUsers: t.procedure.query(() => {
+    return getUsers();
   }),
+  // !RENAME THE USER with GEt user yeah?
+  getUser: t.procedure
+    .input(z.object({ id: z.string() }))
+    .query(({ input }) => {
+      return getUser(input.id);
+    }),
+
+  sendMessage: t.procedure
+    .input(z.object({ userId: z.string(), message: z.string() }))
+    .mutation(({ input }) => {
+      // Emit a 'newMessage' event
+      addMessage(input);
+      eventEmitter.emit("newMessage", input);
+      return { success: true };
+    }),
+
+  onNewMessage: t.procedure.subscription(() => {
+    return observable<{ userId: string; message: string }>((emit) => {
+      const onNewMessage = (data: { userId: string; message: string }) => {
+        emit.next(data);
+      };
+      eventEmitter.on("newMessage", onNewMessage);
+      return () => {
+        eventEmitter.off("newMessage", onNewMessage);
+      };
+    });
+  }),
+
   onUpdate: t.procedure.subscription(() => {
     return observable<string>((emit) => {
       eventEmitter.on("update", emit.next);

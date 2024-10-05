@@ -5,7 +5,7 @@ import {
   splitLink,
   wsLink,
 } from "@trpc/client";
-import type { AppRouter } from "../../server/routers/router";
+import type { AppRouter } from "../../../server/routers/router";
 
 export const trpc = createTRPCProxyClient<AppRouter>({
   links: [
@@ -22,4 +22,3 @@ export const trpc = createTRPCProxyClient<AppRouter>({
     }),
   ],
 });
-
