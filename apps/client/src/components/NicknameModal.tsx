@@ -13,9 +13,14 @@ import {
 interface NicknameModalProps {
   isOpen: boolean;
   onSubmit: (nickname: string) => void;
+  isLoading: boolean;
 }
 
-export function NicknameModal({ isOpen, onSubmit }: NicknameModalProps) {
+export function NicknameModal({
+  isOpen,
+  onSubmit,
+  isLoading,
+}: NicknameModalProps) {
   const [nickname, setNickname] = useState("");
 
   const handleSubmit = (event: React.FormEvent) => {
@@ -46,8 +51,8 @@ export function NicknameModal({ isOpen, onSubmit }: NicknameModalProps) {
             />
           </div>
           <DialogFooter>
-            <Button type="submit" disabled={!nickname.trim()}>
-              Set Nickname
+            <Button type="submit" disabled={!nickname.trim() || isLoading}>
+              {isLoading ? "Setting Nickname..." : "Set Nickname"}
             </Button>
           </DialogFooter>
         </form>

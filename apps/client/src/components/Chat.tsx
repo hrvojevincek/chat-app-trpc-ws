@@ -8,34 +8,36 @@ import { UsersList } from "./UsersList";
 
 export default function Chat() {
   const [isNicknameModalOpen, setIsNicknameModalOpen] = useState(false);
-  const [userId, setUserId] = useState<{ id: string; name: string } | null>(
-    null
-  );
-
-  const { addUser } = useUsers();
+  const [isLoading, setIsLoading] = useState(false);
+  const { addUser, verifyUser, setCurrentUser } = useUsers();
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-
-    if (storedUser) {
-      setUserId(JSON.parse(storedUser));
-    } else {
+    const checkUser = async () => {
+      const storedUser = localStorage.getItem("currentUser");
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        const isValid = await verifyUser(parsedUser.id);
+        if (isValid) {
+          setCurrentUser(parsedUser);
+          return;
+        }
+      }
       setIsNicknameModalOpen(true);
-    }
-  }, []);
+    };
+    checkUser();
+  }, [verifyUser]);
 
   const handleNicknameSubmit = async (nickname: string) => {
+    setIsLoading(true);
     try {
-      const user = await addUser(nickname);
-      setUserId({ id: user.id, name: user.name });
-      localStorage.setItem(
-        "user",
-        JSON.stringify({ id: user.id, name: user.name })
-      );
+      const newUser = await addUser(nickname);
+      setCurrentUser(newUser);
       setIsNicknameModalOpen(false);
     } catch (error) {
       console.error("Error creating user:", error);
       // Handle error (e.g., show an error message to the user)
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -44,6 +46,7 @@ export default function Chat() {
       <NicknameModal
         isOpen={isNicknameModalOpen}
         onSubmit={handleNicknameSubmit}
+        isLoading={isLoading}
       />
       <div className="grid grid-cols-4 max-w-[1200px] w-full mx-auto h-[650px] rounded-lg overflow-hidden border">
         <div className="bg-muted/20 col-span-1 p-4 border-r">

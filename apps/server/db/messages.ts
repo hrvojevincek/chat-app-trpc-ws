@@ -1,12 +1,12 @@
 let messages: {
   id: string;
-  userId: string;
+  author: string;
   message: string;
   timestamp: Date;
 }[] = [];
 
-export function addMessage(message: { userId: string; message: string }) {
-  const newMessage = { userId: message.userId, message: message.message };
+export function addMessage(message: { author: string; message: string }) {
+  const newMessage = { author: message.author, message: message.message };
   const id = crypto.randomUUID();
   const timestamp = new Date();
   messages.push({ id, timestamp, ...newMessage });

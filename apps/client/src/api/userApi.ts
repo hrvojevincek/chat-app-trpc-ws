@@ -8,6 +8,10 @@ export async function getUsers() {
   return trpc.getUsers.query();
 }
 
+export async function getCurrentUser(id: string) {
+  return trpc.getUser.query({ id });
+}
+
 export function subscribeToNewUsers(
   onNewUser: (user: { id: string; name: string }) => void
 ) {

@@ -3,12 +3,15 @@ import { sendMessage, subscribeToNewMessages } from "../api/messageApi";
 
 export function useMessages() {
   const [messages, setMessages] = useState<
-    { userId: string; message: string }[]
+    { author: string; message: string }[]
   >([]);
 
   useEffect(() => {
     const subscription = subscribeToNewMessages((newMessage) => {
-      setMessages((prevMessages) => [...prevMessages, newMessage]);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { ...newMessage, author: newMessage.author || "" },
+      ]);
     });
 
     return () => {
@@ -16,8 +19,8 @@ export function useMessages() {
     };
   }, []);
 
-  const sendNewMessage = async (userId: string, message: string) => {
-    await sendMessage(userId, message);
+  const sendNewMessage = async (author: string, message: string) => {
+    await sendMessage(author, message);
   };
 
   return { messages, sendNewMessage };

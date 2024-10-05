@@ -31,7 +31,7 @@ export const appRouter = t.router({
   getUsers: t.procedure.query(() => {
     return getUsers();
   }),
-  // !RENAME THE USER with GEt user yeah?
+
   getUser: t.procedure
     .input(z.object({ id: z.string() }))
     .query(({ input }) => {
@@ -39,7 +39,7 @@ export const appRouter = t.router({
     }),
 
   sendMessage: t.procedure
-    .input(z.object({ userId: z.string(), message: z.string() }))
+    .input(z.object({ author: z.string(), message: z.string() }))
     .mutation(({ input }) => {
       // Emit a 'newMessage' event
       addMessage(input);
@@ -48,8 +48,8 @@ export const appRouter = t.router({
     }),
 
   onNewMessage: t.procedure.subscription(() => {
-    return observable<{ userId: string; message: string }>((emit) => {
-      const onNewMessage = (data: { userId: string; message: string }) => {
+    return observable<{ author: string; message: string }>((emit) => {
+      const onNewMessage = (data: { author: string; message: string }) => {
         emit.next(data);
       };
       eventEmitter.on("newMessage", onNewMessage);
