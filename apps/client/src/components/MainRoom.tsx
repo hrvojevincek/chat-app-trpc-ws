@@ -3,12 +3,15 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useMessages } from "@/hooks/useMessages";
 import { useState } from "react";
+import { toast } from "sonner";
 import Message from "./Message";
 import { Input } from "./ui/input";
+import { handleCommand } from "@/util/handleCommand";
 
 const MainRoom = () => {
   const [messageInput, setMessageInput] = useState("");
-  const { messages, sendNewMessage } = useMessages();
+  const { messages, sendNewMessage, removeLastMessageFromAuthor } =
+    useMessages();
 
   const handleSubmitSendMessage = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -17,12 +20,33 @@ const MainRoom = () => {
         const userString = localStorage.getItem("currentUser");
         if (userString) {
           const user = JSON.parse(userString);
-          await sendNewMessage(user.name, messageInput.trim());
+
+          const { command, messageContent } = handleCommand(
+            messageInput.trim()
+          );
+
+          if (command) {
+            // Handle commands light dark think edit oops
+            if (command === "think") {
+              await sendNewMessage(user.name, messageContent.trim(), true);
+            }
+            if (command === "oops") {
+              const success = await removeLastMessageFromAuthor(user.name);
+              if (success) {
+                toast.success("Last message removed");
+              } else {
+                toast.error("No message to remove");
+              }
+            }
+          } else {
+            await sendNewMessage(user.name, messageInput.trim());
+          }
+
           setMessageInput("");
         }
       } catch (error) {
         console.error("Error sending message:", error);
-        // Handle error (e.g., show an error message to the user)
+        toast.error("Error sending message");
       }
     }
   };
@@ -61,7 +85,12 @@ const MainRoom = () => {
             className="flex-1"
             autoComplete="off"
           />
-          <Button type="submit" size="icon" className="rounded-xl">
+          <Button
+            type="submit"
+            size="icon"
+            className="rounded-xl"
+            disabled={!messageInput.trim()}
+          >
             <SendIcon className="h-4 w-4 " />
             <span className="sr-only">Send</span>
           </Button>

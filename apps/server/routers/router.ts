@@ -3,7 +3,7 @@ import { t } from "../trpc";
 import { z } from "zod";
 import EventEmitter from "events";
 import { addUser, getUser, getUsers } from "../db/users";
-import { addMessage } from "../db/messages";
+import { addMessage, removeLastMessageFromAuthor } from "../db/messages";
 
 const eventEmitter = new EventEmitter();
 
@@ -39,7 +39,13 @@ export const appRouter = t.router({
     }),
 
   sendMessage: t.procedure
-    .input(z.object({ author: z.string(), message: z.string() }))
+    .input(
+      z.object({
+        author: z.string(),
+        message: z.string(),
+        isItalic: z.boolean().optional(),
+      })
+    )
     .mutation(({ input }) => {
       // Emit a 'newMessage' event
       addMessage(input);
@@ -48,16 +54,33 @@ export const appRouter = t.router({
     }),
 
   onNewMessage: t.procedure.subscription(() => {
-    return observable<{ author: string; message: string }>((emit) => {
-      const onNewMessage = (data: { author: string; message: string }) => {
-        emit.next(data);
-      };
-      eventEmitter.on("newMessage", onNewMessage);
-      return () => {
-        eventEmitter.off("newMessage", onNewMessage);
-      };
-    });
+    return observable<{ author: string; message: string; isItalic?: boolean }>(
+      (emit) => {
+        const onNewMessage = (data: {
+          author: string;
+          message: string;
+          isItalic?: boolean;
+        }) => {
+          emit.next(data);
+        };
+        eventEmitter.on("newMessage", onNewMessage);
+        return () => {
+          eventEmitter.off("newMessage", onNewMessage);
+        };
+      }
+    );
   }),
+
+  removeLastMessage: t.procedure
+    .input(z.object({ author: z.string() }))
+    .mutation(({ input }) => {
+      const removedMessage = removeLastMessageFromAuthor(input.author);
+      if (removedMessage) {
+        eventEmitter.emit("messageRemoved", removedMessage);
+        return { success: true, removedMessage };
+      }
+      return { success: false };
+    }),
 
   onUpdate: t.procedure.subscription(() => {
     return observable<string>((emit) => {

@@ -4,9 +4,10 @@ import { formatDistanceToNow } from "date-fns";
 interface MessageProps {
   author: string;
   message: string;
+  isItalic?: boolean;
 }
 
-const Message = ({ author, message }: MessageProps) => {
+const Message = ({ author, message, isItalic }: MessageProps) => {
   return (
     <div className="flex gap-4">
       <Avatar className="w-10 h-10 border">
@@ -21,7 +22,7 @@ const Message = ({ author, message }: MessageProps) => {
           </div>
         </div>
         <div className="text-left">
-          <p>{message}</p>
+          <p className={isItalic ? "italic" : ""}>{message}</p>
         </div>
       </div>
     </div>
