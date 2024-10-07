@@ -1,15 +1,17 @@
+import { changeTitle, subscribeToTitleChanges } from "@/api/titleApi";
 import { SearchIcon, SendIcon } from "@/assets/icons";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useMessages } from "@/hooks/useMessages";
+import { useThemeToggle } from "@/hooks/useThemeToggle";
 import { handleCommand } from "@/util/handleCommand";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import Message from "./Message";
 import { Input } from "./ui/input";
-import { changeTitle, subscribeToTitleChanges } from "@/api/titleApi";
 
 const MainRoom = () => {
+  const toggleTheme = useThemeToggle();
   const [messageInput, setMessageInput] = useState("");
   const { messages, sendNewMessage, removeLastMessageFromAuthor } =
     useMessages();
@@ -51,6 +53,16 @@ const MainRoom = () => {
             if (command === "nick") {
               await changeTitle(messageContent.trim());
               toast.success(`Title changed to: ${messageContent.trim()}`);
+            }
+            if (command === "light") {
+              toggleTheme("light");
+              setMessageInput("");
+              return;
+            }
+            if (command === "dark") {
+              toggleTheme("dark");
+              setMessageInput("");
+              return;
             }
           } else {
             await sendNewMessage(user.name, messageInput.trim());

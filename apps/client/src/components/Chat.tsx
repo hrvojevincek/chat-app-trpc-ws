@@ -9,7 +9,7 @@ import { UsersList } from "./UsersList";
 export default function Chat() {
   const [isNicknameModalOpen, setIsNicknameModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { addUser, verifyUser, setCurrentUser } = useUsers();
+  const { addUser, verifyUser, currentUser, setCurrentUser } = useUsers();
 
   useEffect(() => {
     const checkUser = async () => {
@@ -57,7 +57,7 @@ export default function Chat() {
               <span className="sr-only">Create new chat</span>
             </Button>
           </div>
-          <UsersList />
+          <UsersList currentUser={currentUser} />
         </div>
 
         <MainRoom />

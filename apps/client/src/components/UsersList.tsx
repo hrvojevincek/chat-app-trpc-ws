@@ -1,7 +1,11 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useUsers } from "@/hooks/useUsers";
 
-export function UsersList() {
+interface UsersListProps {
+  currentUser: { id: string; name: string } | null;
+}
+
+export function UsersList({ currentUser }: UsersListProps) {
   const { users } = useUsers();
 
   return (
@@ -15,7 +19,13 @@ export function UsersList() {
             </AvatarFallback>
           </Avatar>
           <div className="text-left">
-            <p className="text-sm font-medium truncate">{user.name}</p>
+            <p
+              className={`text-sm ${
+                currentUser?.id === user.id ? "font-extrabold" : "font-medium"
+              } truncate`}
+            >
+              {user.name}
+            </p>
             <p className="text-xs text-muted-foreground">Online</p>
           </div>
         </div>
