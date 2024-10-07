@@ -2,16 +2,27 @@ import { SearchIcon, SendIcon } from "@/assets/icons";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useMessages } from "@/hooks/useMessages";
-import { useState } from "react";
+import { handleCommand } from "@/util/handleCommand";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import Message from "./Message";
 import { Input } from "./ui/input";
-import { handleCommand } from "@/util/handleCommand";
+import { changeTitle, subscribeToTitleChanges } from "@/api/titleApi";
 
 const MainRoom = () => {
   const [messageInput, setMessageInput] = useState("");
   const { messages, sendNewMessage, removeLastMessageFromAuthor } =
     useMessages();
+
+  useEffect(() => {
+    const subscription = subscribeToTitleChanges((newTitle) => {
+      document.title = newTitle;
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const handleSubmitSendMessage = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -26,7 +37,6 @@ const MainRoom = () => {
           );
 
           if (command) {
-            // Handle commands light dark think edit oops
             if (command === "think") {
               await sendNewMessage(user.name, messageContent.trim(), true);
             }
@@ -37,6 +47,10 @@ const MainRoom = () => {
               } else {
                 toast.error("No message to remove");
               }
+            }
+            if (command === "nick") {
+              await changeTitle(messageContent.trim());
+              toast.success(`Title changed to: ${messageContent.trim()}`);
             }
           } else {
             await sendNewMessage(user.name, messageInput.trim());
@@ -68,7 +82,12 @@ const MainRoom = () => {
       <ScrollArea className="flex-1">
         <div className="grid p-4 space-y-4">
           {messages.map((msg, index) => (
-            <Message key={index} {...msg} />
+            <Message
+              key={index}
+              author={msg.author}
+              message={msg.message}
+              isItalic={msg.isItalic}
+            />
           ))}
         </div>
       </ScrollArea>

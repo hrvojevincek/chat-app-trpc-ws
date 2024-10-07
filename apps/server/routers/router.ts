@@ -85,8 +85,32 @@ export const appRouter = t.router({
         eventEmitter.emit("messageRemoved", removedMessage);
         return { success: true, removedMessage };
       }
-      return { success: false };
+      return { success: false, removedMessage: null };
     }),
+
+  onMessageRemoved: t.procedure.subscription(() => {
+    return observable<{
+      id: string;
+      author: string;
+      message: string;
+      isItalic?: boolean;
+      timestamp: Date;
+    }>((emit) => {
+      const onMessageRemoved = (data: {
+        id: string;
+        author: string;
+        message: string;
+        isItalic?: boolean;
+        timestamp: Date;
+      }) => {
+        emit.next(data);
+      };
+      eventEmitter.on("messageRemoved", onMessageRemoved);
+      return () => {
+        eventEmitter.off("messageRemoved", onMessageRemoved);
+      };
+    });
+  }),
 
   onUpdate: t.procedure.subscription(() => {
     return observable<string>((emit) => {
@@ -94,6 +118,25 @@ export const appRouter = t.router({
 
       return () => {
         eventEmitter.off("update", emit.next);
+      };
+    });
+  }),
+  // TODO: TITLE
+  changeTitle: t.procedure
+    .input(z.object({ title: z.string() }))
+    .mutation(({ input }) => {
+      eventEmitter.emit("titleChanged", input.title);
+      return { success: true };
+    }),
+
+  onTitleChanged: t.procedure.subscription(() => {
+    return observable<string>((emit) => {
+      const onTitleChanged = (title: string) => {
+        emit.next(title);
+      };
+      eventEmitter.on("titleChanged", onTitleChanged);
+      return () => {
+        eventEmitter.off("titleChanged", onTitleChanged);
       };
     });
   }),

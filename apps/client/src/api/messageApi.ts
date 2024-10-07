@@ -22,5 +22,21 @@ export function subscribeToNewMessages(
 }
 
 export async function removeLastMessage(author: string) {
-  return trpc.removeLastMessage.mutate({ author });
+  const result = await trpc.removeLastMessage.mutate({ author });
+  return result;
+}
+
+export function subscribeToRemovedMessages(
+  onMessageRemoved: (data: {
+    id: string;
+    author: string;
+    message: string;
+    isItalic?: boolean;
+  }) => void
+) {
+  return trpc.onMessageRemoved.subscribe(undefined, {
+    onData: (data) => {
+      onMessageRemoved(data);
+    },
+  });
 }
