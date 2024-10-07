@@ -7,14 +7,19 @@ import {
 
 export function useMessages() {
   const [messages, setMessages] = useState<
-    { author: string; message: string; isItalic?: boolean }[]
+    { id: string; author: string; message: string; isItalic?: boolean }[]
   >([]);
 
   useEffect(() => {
     const subscription = subscribeToNewMessages((newMessage) => {
       setMessages((prevMessages) => [
         ...prevMessages,
-        { ...newMessage, author: newMessage.author || "" },
+        {
+          id: newMessage.id,
+          author: newMessage.author || "",
+          message: newMessage.message,
+          isItalic: newMessage.isItalic,
+        },
       ]);
     });
 
@@ -35,8 +40,11 @@ export function useMessages() {
     const result = await removeLastMessage(author);
     if (result.success) {
       setMessages((prevMessages) => {
-        const index = prevMessages.findIndex((msg) => msg.author === author);
-        if (index !== -1) {
+        const reversedIndex = [...prevMessages]
+          .reverse()
+          .findIndex((msg) => msg.author === author);
+        if (reversedIndex !== -1) {
+          const index = prevMessages.length - 1 - reversedIndex;
           return [
             ...prevMessages.slice(0, index),
             ...prevMessages.slice(index + 1),

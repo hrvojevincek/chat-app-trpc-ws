@@ -54,21 +54,27 @@ export const appRouter = t.router({
     }),
 
   onNewMessage: t.procedure.subscription(() => {
-    return observable<{ author: string; message: string; isItalic?: boolean }>(
-      (emit) => {
-        const onNewMessage = (data: {
-          author: string;
-          message: string;
-          isItalic?: boolean;
-        }) => {
-          emit.next(data);
-        };
-        eventEmitter.on("newMessage", onNewMessage);
-        return () => {
-          eventEmitter.off("newMessage", onNewMessage);
-        };
-      }
-    );
+    return observable<{
+      id: string;
+      author: string;
+      message: string;
+      isItalic?: boolean;
+      timestamp: Date;
+    }>((emit) => {
+      const onNewMessage = (data: {
+        id: string;
+        author: string;
+        message: string;
+        isItalic?: boolean;
+        timestamp: Date;
+      }) => {
+        emit.next(data);
+      };
+      eventEmitter.on("newMessage", onNewMessage);
+      return () => {
+        eventEmitter.off("newMessage", onNewMessage);
+      };
+    });
   }),
 
   removeLastMessage: t.procedure

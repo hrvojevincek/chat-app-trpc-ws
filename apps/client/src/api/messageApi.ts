@@ -10,6 +10,7 @@ export async function sendMessage(
 
 export function subscribeToNewMessages(
   onNewMessage: (data: {
+    id: string;
     author: string;
     message: string;
     isItalic?: boolean;
