@@ -46,6 +46,11 @@ const MainRoom = () => {
             messageInput.trim()
           );
 
+          // Replace emoticons with emojis
+          const replaceEmoticons = (text: string) => {
+            return text.replace(/:\)/g, "😊").replace(/;\)/g, "😉");
+          };
+
           if (command) {
             if (command === "think") {
               await sendNewMessage(user.name, messageContent.trim(), true);
@@ -73,7 +78,8 @@ const MainRoom = () => {
               return;
             }
           } else {
-            await sendNewMessage(user.name, messageInput.trim());
+            const processedMessage = replaceEmoticons(messageInput.trim());
+            await sendNewMessage(user.name, processedMessage);
           }
 
           setMessageInput("");
