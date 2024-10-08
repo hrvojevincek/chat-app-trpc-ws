@@ -72,5 +72,22 @@ export function useUsers() {
     [users]
   );
 
-  return { users, currentUser, setCurrentUser, addUser, getUser, verifyUser };
+  const isNicknameTaken = useCallback(
+    (nickname: string): boolean => {
+      return users.some(
+        (user) => user.name.toLowerCase() === nickname.toLowerCase()
+      );
+    },
+    [users]
+  );
+
+  return {
+    users,
+    currentUser,
+    setCurrentUser,
+    addUser,
+    getUser,
+    verifyUser,
+    isNicknameTaken,
+  };
 }
