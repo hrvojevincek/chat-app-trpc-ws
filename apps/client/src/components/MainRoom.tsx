@@ -1,11 +1,10 @@
 import { changeTitle, subscribeToTitleChanges } from "@/api/titleApi";
 import { SearchIcon, SendIcon } from "@/assets/icons";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useMessages } from "@/hooks/useMessages";
 import { useThemeToggle } from "@/hooks/useThemeToggle";
 import { handleCommand } from "@/util/handleCommand";
-import { useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import { toast } from "sonner";
 import Message from "./Message";
 import { Input } from "./ui/input";
@@ -15,6 +14,11 @@ const MainRoom = () => {
   const [messageInput, setMessageInput] = useState("");
   const { messages, sendNewMessage, removeLastMessageFromAuthor } =
     useMessages();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   useEffect(() => {
     const subscription = subscribeToTitleChanges((newTitle) => {
@@ -25,6 +29,10 @@ const MainRoom = () => {
       subscription.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleSubmitSendMessage = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -78,7 +86,7 @@ const MainRoom = () => {
   };
 
   return (
-    <div className="flex flex-col col-span-3 w-full">
+    <div className="flex flex-col col-span-3 w-full h-full">
       <div className="flex items-center justify-between border-b p-4">
         <div className="flex items-center gap-3">
           <div>
@@ -91,8 +99,8 @@ const MainRoom = () => {
           <span className="sr-only">Search</span>
         </Button>
       </div>
-      <ScrollArea className="flex-1">
-        <div className="grid p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex flex-col space-y-4">
           {messages.map((msg, index) => (
             <Message
               key={index}
@@ -101,8 +109,9 @@ const MainRoom = () => {
               isItalic={msg.isItalic}
             />
           ))}
+          <div ref={messagesEndRef} />
         </div>
-      </ScrollArea>
+      </div>
       <div className="border-t p-4">
         <form
           onSubmit={handleSubmitSendMessage}

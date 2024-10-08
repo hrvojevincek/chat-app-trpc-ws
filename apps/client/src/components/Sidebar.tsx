@@ -12,7 +12,7 @@ const Sidebar = () => {
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-medium">Chat</h2>
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
               <InfoCircledIcon className="h-4 w-4" />
               <span className="sr-only">Create new chat</span>
