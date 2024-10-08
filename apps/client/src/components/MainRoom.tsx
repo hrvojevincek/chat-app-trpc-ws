@@ -78,7 +78,7 @@ const MainRoom = () => {
   };
 
   return (
-    <div className="flex flex-col col-span-3">
+    <div className="flex flex-col col-span-3 w-full">
       <div className="flex items-center justify-between border-b p-4">
         <div className="flex items-center gap-3">
           <div>

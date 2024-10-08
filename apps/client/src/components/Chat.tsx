@@ -1,15 +1,13 @@
-import { PlusIcon } from "@/assets/icons";
-import { Button } from "@/components/ui/button";
 import { useUsers } from "@/hooks/useUsers";
 import { useEffect, useState } from "react";
 import MainRoom from "./MainRoom";
 import { NicknameModal } from "./NicknameModal";
-import { UsersList } from "./UsersList";
+import Sidebar from "./Sidebar";
 
 export default function Chat() {
   const [isNicknameModalOpen, setIsNicknameModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { addUser, verifyUser, currentUser, setCurrentUser } = useUsers();
+  const { addUser, verifyUser, setCurrentUser } = useUsers();
 
   useEffect(() => {
     const checkUser = async () => {
@@ -48,17 +46,8 @@ export default function Chat() {
         onSubmit={handleNicknameSubmit}
         isLoading={isLoading}
       />
-      <div className="grid grid-cols-4 max-w-[1200px] w-full mx-auto h-[650px] rounded-lg overflow-hidden border">
-        <div className="bg-muted/20 col-span-1 p-4 border-r">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-medium">Main Room</h2>
-            <Button variant="ghost" size="icon" className="rounded-full">
-              <PlusIcon className="h-4 w-4" />
-              <span className="sr-only">Create new chat</span>
-            </Button>
-          </div>
-          <UsersList currentUser={currentUser} />
-        </div>
+      <div className="flex rounded-lg overflow-hidden border h-full">
+        <Sidebar />
 
         <MainRoom />
       </div>
