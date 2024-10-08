@@ -56,7 +56,8 @@ export function NicknameModal({
         <DialogHeader>
           <DialogTitle>Set Your Nickname</DialogTitle>
           <DialogDescription>
-            Please enter a nickname to use in the chat. Only letters and numbers are allowed.
+            Please enter a nickname to use in the chat. Only letters and numbers
+            are allowed.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
@@ -72,7 +73,10 @@ export function NicknameModal({
             {error && <p className="text-xs text-red-500">{error}</p>}
           </div>
           <DialogFooter>
-            <Button type="submit" disabled={!nickname.trim() || isLoading || !!error}>
+            <Button
+              type="submit"
+              disabled={!nickname.trim() || isLoading || !!error}
+            >
               {isLoading ? "Setting Nickname..." : "Set Nickname"}
             </Button>
           </DialogFooter>
