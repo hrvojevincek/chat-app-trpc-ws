@@ -47,6 +47,3 @@ Follow these steps to run the application locally:
 
 4. Open your browser and navigate to `http://localhost:3000` (or the port specified in the console output).
 
-## Environment Variables
-
-If your application requires any environment variables, create a `.env` file in the root directory and add them there. For example:
